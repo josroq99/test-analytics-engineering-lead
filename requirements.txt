@@ -1,0 +1,38 @@
+# Data Mart de Marketing - Dependencias de Python
+# Versión: 1.0.0
+
+# Core dbt packages
+dbt-core==1.7.0
+dbt-bigquery==1.7.0
+
+# Utilities
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Development tools
+pytest==7.4.0
+pytest-cov==4.1.0
+black==23.7.0
+flake8==6.0.0
+
+# Documentation
+mkdocs==1.5.2
+mkdocs-material==9.2.3
+
+# Data analysis
+pandas==2.0.3
+numpy==1.24.3
+matplotlib==3.7.2
+seaborn==0.12.2
+
+# Google Cloud
+google-cloud-bigquery==3.11.4
+google-cloud-storage==2.10.0
+google-auth==2.22.0
+google-auth-oauthlib==1.0.0
+google-auth-httplib2==0.1.1
+
+# CLI tools
+click==8.1.7
+rich==13.4.2
+tabulate==0.9.0

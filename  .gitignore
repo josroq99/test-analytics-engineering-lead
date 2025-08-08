@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# dbt
+/dbt_packages/
+/target/
+/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Credentials / local
+.env
+*.json
+*.key
+
+# IDE
+.vscode/
+.idea/

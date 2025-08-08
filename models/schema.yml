@@ -1,0 +1,159 @@
+version: 2
+
+models:
+  - name: stg_bank_marketing
+    description: "Staging model for main bank marketing dataset"
+    columns:
+      - name: contact_id
+        description: "Unique identifier for each contact"
+        tests:
+          - unique
+          - not_null
+      - name: age
+        description: "Age of the customer"
+        tests:
+          - not_null
+          - accepted_range:
+              min_value: 17
+              max_value: 95
+      - name: job
+        description: "Type of job"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["admin.", "unknown", "unemployed", "management", "housemaid", "entrepreneur", "student", "blue-collar", "self-employed", "retired", "technician", "services"]
+      - name: subscribed_deposit
+        description: "Target variable - whether customer subscribed"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["yes", "no"]
+
+  - name: stg_bank_additional
+    description: "Staging model for bank marketing dataset with socio-economic context"
+    columns:
+      - name: contact_id
+        description: "Unique identifier for each contact"
+        tests:
+          - unique
+          - not_null
+      - name: age
+        description: "Age of the customer"
+        tests:
+          - not_null
+          - accepted_range:
+              min_value: 17
+              max_value: 95
+      - name: subscribed_deposit
+        description: "Target variable - whether customer subscribed"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["yes", "no"]
+
+  - name: int_customer_profiles
+    description: "Intermediate model for customer profiles and segmentation"
+    columns:
+      - name: contact_id
+        description: "Unique identifier for each contact"
+        tests:
+          - unique
+          - not_null
+      - name: age_group
+        description: "Age group categorization"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["young", "adult", "middle_age", "senior"]
+      - name: risk_profile
+        description: "Customer risk profile"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["high_risk", "medium_risk", "low_risk", "no_risk"]
+      - name: customer_segment
+        description: "Customer segment based on demographics and behavior"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["young_professional", "retired", "white_collar", "blue_collar", "other"]
+
+  - name: int_campaign_performance
+    description: "Intermediate model for campaign performance metrics"
+    columns:
+      - name: contact_id
+        description: "Unique identifier for each contact"
+        tests:
+          - unique
+          - not_null
+      - name: call_duration_category
+        description: "Categorization of call duration"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["short", "medium", "long"]
+      - name: contact_frequency
+        description: "Frequency of contacts in campaign"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["first_contact", "few_contacts", "many_contacts"]
+      - name: conversion_probability_score
+        description: "Simulated conversion probability score"
+        tests:
+          - not_null
+          - accepted_range:
+              min_value: 0.0
+              max_value: 1.0
+
+  - name: fct_marketing_conversions
+    description: "Fact table with marketing conversion metrics"
+    columns:
+      - name: contact_id
+        description: "Unique identifier for each contact"
+        tests:
+          - unique
+          - not_null
+      - name: conversion_flag
+        description: "Binary flag for successful conversion"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: conversion_rate
+        description: "Conversion rate (0.0 or 1.0)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0.0, 1.0]
+      - name: campaign_contacts
+        description: "Number of contacts in current campaign"
+        tests:
+          - not_null
+          - positive_values
+      - name: contact_duration_seconds
+        description: "Duration of contact in seconds"
+        tests:
+          - not_null
+          - positive_values
+
+  - name: dim_customer_segments
+    description: "Dimension table for customer segments"
+    columns:
+      - name: customer_segment
+        description: "Customer segment identifier"
+        tests:
+          - unique
+          - not_null
+      - name: contact_priority
+        description: "Contact priority level"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["high", "medium", "low"]
+      - name: recommended_product
+        description: "Recommended product for segment"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["investment_products", "retirement_products", "premium_services", "basic_products", "general_products"]

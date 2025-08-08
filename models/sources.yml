@@ -1,0 +1,192 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw data sources from BigQuery"
+    tables:
+      - name: bank_marketing
+        description: "Main bank marketing dataset from UCI repository"
+        columns:
+          - name: age
+            description: "Age of the customer"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]
+          - name: job
+            description: "Type of job"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["admin.", "unknown", "unemployed", "management", "housemaid", "entrepreneur", "student", "blue-collar", "self-employed", "retired", "technician", "services"]
+          - name: marital
+            description: "Marital status"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["married", "divorced", "single"]
+          - name: education
+            description: "Education level"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["unknown", "secondary", "primary", "tertiary"]
+          - name: default
+            description: "Has credit in default"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["yes", "no"]
+          - name: balance
+            description: "Average yearly balance in euros"
+            tests:
+              - not_null
+          - name: housing
+            description: "Has housing loan"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["yes", "no"]
+          - name: loan
+            description: "Has personal loan"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["yes", "no"]
+          - name: contact
+            description: "Contact communication type"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["unknown", "telephone", "cellular"]
+          - name: day
+            description: "Last contact day of the month"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
+          - name: month
+            description: "Last contact month of year"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+          - name: duration
+            description: "Last contact duration in seconds"
+            tests:
+              - not_null
+              - positive_values
+          - name: campaign
+            description: "Number of contacts performed during this campaign"
+            tests:
+              - not_null
+              - positive_values
+          - name: pdays
+            description: "Number of days since last contact from previous campaign"
+            tests:
+              - not_null
+          - name: previous
+            description: "Number of contacts performed before this campaign"
+            tests:
+              - not_null
+              - positive_values
+          - name: poutcome
+            description: "Outcome of the previous marketing campaign"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["unknown", "other", "failure", "success"]
+          - name: y
+            description: "Has the client subscribed a term deposit"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["yes", "no"]
+
+      - name: bank_additional
+        description: "Bank marketing dataset with additional socio-economic context"
+        columns:
+          - name: age
+            description: "Age of the customer"
+            tests:
+              - not_null
+          - name: job
+            description: "Type of job"
+            tests:
+              - not_null
+          - name: marital
+            description: "Marital status"
+            tests:
+              - not_null
+          - name: education
+            description: "Education level"
+            tests:
+              - not_null
+          - name: default
+            description: "Has credit in default"
+            tests:
+              - not_null
+          - name: housing
+            description: "Has housing loan"
+            tests:
+              - not_null
+          - name: loan
+            description: "Has personal loan"
+            tests:
+              - not_null
+          - name: contact
+            description: "Contact communication type"
+            tests:
+              - not_null
+          - name: month
+            description: "Last contact month of year"
+            tests:
+              - not_null
+          - name: day_of_week
+            description: "Last contact day of the week"
+            tests:
+              - not_null
+          - name: duration
+            description: "Last contact duration in seconds"
+            tests:
+              - not_null
+          - name: campaign
+            description: "Number of contacts performed during this campaign"
+            tests:
+              - not_null
+          - name: pdays
+            description: "Number of days since last contact from previous campaign"
+            tests:
+              - not_null
+          - name: previous
+            description: "Number of contacts performed before this campaign"
+            tests:
+              - not_null
+          - name: poutcome
+            description: "Outcome of the previous marketing campaign"
+            tests:
+              - not_null
+          - name: emp_var_rate
+            description: "Employment variation rate - quarterly indicator"
+            tests:
+              - not_null
+          - name: cons_price_idx
+            description: "Consumer price index - monthly indicator"
+            tests:
+              - not_null
+          - name: cons_conf_idx
+            description: "Consumer confidence index - monthly indicator"
+            tests:
+              - not_null
+          - name: euribor3m
+            description: "Euribor 3 month rate - daily indicator"
+            tests:
+              - not_null
+          - name: nr_employed
+            description: "Number of employees - quarterly indicator"
+            tests:
+              - not_null
+          - name: y
+            description: "Has the client subscribed a term deposit"
+            tests:
+              - not_null

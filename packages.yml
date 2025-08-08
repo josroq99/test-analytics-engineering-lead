@@ -1,0 +1,13 @@
+packages:
+  - package: dbt-labs/codegen
+    version: 0.9.0
+    
+  - package: dbt-labs/audit_helper
+    version: 0.9.0
+    
+  - package: dbt-labs/dbt_utils
+    version: 1.1.1
+    
+  # spark_utils no es necesario en BigQuery, pero lo dejo si lo usas en local; puedes eliminarlo si no aplica
+  - package: dbt-labs/spark_utils
+    version: 0.3.7
