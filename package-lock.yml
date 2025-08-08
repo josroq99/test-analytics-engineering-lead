@@ -1,0 +1,11 @@
+packages:
+  - name: dbt_utils
+    package: dbt-labs/dbt_utils
+    version: 1.1.1
+  - name: codegen
+    package: dbt-labs/codegen
+    version: 0.9.0
+  - name: audit_helper
+    package: dbt-labs/audit_helper
+    version: 0.9.0
+sha1_hash: e6b78f7d1a3a0a52ee076eac54c292b95ff5d364

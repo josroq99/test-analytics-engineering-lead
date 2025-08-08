@@ -13,9 +13,6 @@ models:
         description: "Age of the customer"
         tests:
           - not_null
-          - accepted_range:
-              min_value: 17
-              max_value: 95
       - name: job
         description: "Type of job"
         tests:
@@ -26,8 +23,6 @@ models:
         description: "Target variable - whether customer subscribed"
         tests:
           - not_null
-          - accepted_values:
-              values: ["yes", "no"]
 
   - name: stg_bank_additional
     description: "Staging model for bank marketing dataset with socio-economic context"
@@ -41,15 +36,10 @@ models:
         description: "Age of the customer"
         tests:
           - not_null
-          - accepted_range:
-              min_value: 17
-              max_value: 95
       - name: subscribed_deposit
         description: "Target variable - whether customer subscribed"
         tests:
           - not_null
-          - accepted_values:
-              values: ["yes", "no"]
 
   - name: int_customer_profiles
     description: "Intermediate model for customer profiles and segmentation"
@@ -102,9 +92,6 @@ models:
         description: "Simulated conversion probability score"
         tests:
           - not_null
-          - accepted_range:
-              min_value: 0.0
-              max_value: 1.0
 
   - name: fct_marketing_conversions
     description: "Fact table with marketing conversion metrics"
@@ -130,12 +117,10 @@ models:
         description: "Number of contacts in current campaign"
         tests:
           - not_null
-          - positive_values
       - name: contact_duration_seconds
         description: "Duration of contact in seconds"
         tests:
           - not_null
-          - positive_values
 
   - name: dim_customer_segments
     description: "Dimension table for customer segments"

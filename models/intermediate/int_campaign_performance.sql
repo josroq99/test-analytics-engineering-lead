@@ -68,11 +68,8 @@ campaign_metrics AS (
             ELSE 'long_gap'
         END as contact_timing,
         
-        -- Indicador de éxito
-        CASE 
-            WHEN subscribed_deposit = 'yes' THEN TRUE
-            ELSE FALSE
-        END as is_successful_conversion,
+        -- Indicador de éxito (subscribed_deposit ya es BOOLEAN)
+        subscribed_deposit as is_successful_conversion,
         
         -- Score de probabilidad (simulado)
         CASE 

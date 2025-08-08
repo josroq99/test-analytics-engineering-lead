@@ -12,9 +12,18 @@ cleaned AS (
         LOWER(TRIM(job)) as job,
         LOWER(TRIM(marital)) as marital_status,
         LOWER(TRIM(education)) as education_level,
-        LOWER(TRIM(default)) as has_default_credit,
-        LOWER(TRIM(housing)) as has_housing_loan,
-        LOWER(TRIM(loan)) as has_personal_loan,
+        cast(CASE 
+            WHEN LOWER(TRIM(`default`)) = 'yes' THEN TRUE
+            ELSE FALSE
+        END as BOOLEAN) as has_default_credit,
+        cast(CASE 
+            WHEN LOWER(TRIM(housing)) = 'yes' THEN TRUE
+            ELSE FALSE
+        END as BOOLEAN) as has_housing_loan,
+        cast(CASE 
+            WHEN LOWER(TRIM(loan)) = 'yes' THEN TRUE
+            ELSE FALSE
+        END as BOOLEAN) as has_personal_loan,
         
         -- Datos del contacto
         LOWER(TRIM(contact)) as contact_type,
@@ -36,7 +45,7 @@ cleaned AS (
         CAST(nr_employed AS FLOAT64) as number_employed,
         
         -- Variable objetivo
-        LOWER(TRIM(y)) as subscribed_deposit,
+        y as subscribed_deposit,
         
         -- Metadatos
         CURRENT_TIMESTAMP() as _loaded_at,
@@ -80,3 +89,4 @@ final AS (
 )
 
 SELECT * FROM final
+
