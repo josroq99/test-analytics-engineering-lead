@@ -51,17 +51,17 @@ conversions_fact AS (
         
         -- Indicadores de riesgo
         CASE 
-            WHEN c.has_default_credit = 'yes' THEN 1
+            WHEN c.has_default_credit = TRUE THEN 1
             ELSE 0
         END as has_default_credit_flag,
         
         CASE 
-            WHEN c.has_housing_loan = 'yes' THEN 1
+            WHEN c.has_housing_loan = TRUE THEN 1
             ELSE 0
         END as has_housing_loan_flag,
         
         CASE 
-            WHEN c.has_personal_loan = 'yes' THEN 1
+            WHEN c.has_personal_loan = TRUE THEN 1
             ELSE 0
         END as has_personal_loan_flag,
         

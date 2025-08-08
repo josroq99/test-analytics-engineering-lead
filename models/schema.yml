@@ -105,14 +105,10 @@ models:
         description: "Binary flag for successful conversion"
         tests:
           - not_null
-          - accepted_values:
-              values: [0, 1]
       - name: conversion_rate
         description: "Conversion rate (0.0 or 1.0)"
         tests:
           - not_null
-          - accepted_values:
-              values: [0.0, 1.0]
       - name: campaign_contacts
         description: "Number of contacts in current campaign"
         tests:

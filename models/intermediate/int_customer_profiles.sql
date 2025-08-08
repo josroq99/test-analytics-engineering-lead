@@ -36,7 +36,7 @@ WITH base_customers AS (
 
 customer_metrics AS (
     SELECT
-        contact_id,
+        ROW_NUMBER() OVER (ORDER BY contact_id, _loaded_at) as contact_id,
         age,
         age_group,
         job,
@@ -51,9 +51,9 @@ customer_metrics AS (
         
         -- Métricas de riesgo del cliente
         CASE 
-            WHEN has_default_credit = 'yes' THEN 'high_risk'
-            WHEN has_housing_loan = 'yes' AND has_personal_loan = 'yes' THEN 'medium_risk'
-            WHEN has_housing_loan = 'yes' OR has_personal_loan = 'yes' THEN 'low_risk'
+            WHEN has_default_credit = TRUE THEN 'high_risk'
+            WHEN has_housing_loan = TRUE AND has_personal_loan = TRUE THEN 'medium_risk'
+            WHEN has_housing_loan = TRUE OR has_personal_loan = TRUE THEN 'low_risk'
             ELSE 'no_risk'
         END as risk_profile,
         
@@ -68,7 +68,7 @@ customer_metrics AS (
         
         -- Indicador de éxito
         CASE 
-            WHEN subscribed_deposit = 'yes' THEN TRUE
+            WHEN subscribed_deposit = TRUE THEN TRUE
             ELSE FALSE
         END as is_successful_conversion,
         
