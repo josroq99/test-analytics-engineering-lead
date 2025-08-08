@@ -1,0 +1,68 @@
+# Configuración de Jobs para dbt Cloud
+# Copiar estas configuraciones en la interfaz de dbt Cloud
+
+jobs:
+  # Job principal - Build completo
+  build_full:
+    name: "Build Completo"
+    description: "Ejecuta build completo del pipeline de marketing bancario"
+    commands:
+      - "dbt deps"
+      - "dbt build --full-refresh"
+    schedule: "0 2 * * *"  # Diario a las 2 AM
+    threads: 4
+    timeout: 3600  # 1 hora
+    
+  # Job de tests
+  run_tests:
+    name: "Ejecutar Tests"
+    description: "Ejecuta todos los tests de calidad de datos"
+    commands:
+      - "dbt deps"
+      - "dbt test"
+    schedule: "0 3 * * *"  # Diario a las 3 AM
+    threads: 4
+    timeout: 1800  # 30 minutos
+    
+  # Job de documentación
+  generate_docs:
+    name: "Generar Documentación"
+    description: "Genera y publica documentación del proyecto"
+    commands:
+      - "dbt deps"
+      - "dbt docs generate"
+      - "dbt docs serve --port 8080"
+    schedule: "0 4 * * 0"  # Semanal los domingos a las 4 AM
+    threads: 2
+    timeout: 900  # 15 minutos
+    
+  # Job de desarrollo
+  dev_build:
+    name: "Build de Desarrollo"
+    description: "Build rápido para desarrollo (sin full-refresh)"
+    commands:
+      - "dbt deps"
+      - "dbt build"
+    schedule: "0 1 * * *"  # Diario a la 1 AM
+    threads: 4
+    timeout: 1800  # 30 minutos
+
+# Configuración de notificaciones
+notifications:
+  on_success: "always"
+  on_failure: "always"
+  on_cancel: "always"
+  
+# Configuración de alertas
+alerts:
+  - name: "Test Failures"
+    condition: "test_failures > 0"
+    channels: ["email", "slack"]
+    
+  - name: "Build Timeout"
+    condition: "build_duration > 3000"
+    channels: ["email"]
+    
+  - name: "Model Failures"
+    condition: "model_failures > 0"
+    channels: ["email", "slack"]
