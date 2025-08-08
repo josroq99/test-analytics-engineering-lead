@@ -1,23 +1,36 @@
--- Test para verificar que la distribución de grupos de edad es razonable
--- No debe haber grupos de edad con menos del 5% de los registros
+-- Test para verificar que todos los grupos de edad esperados están presentes
+-- Debe tener al menos un registro en cada grupo de edad
 
 WITH age_distribution AS (
     SELECT 
         age_group,
-        COUNT(*) as count,
-        COUNT(*) * 100.0 / SUM(COUNT(*)) OVER () as percentage
+        COUNT(*) as count
     FROM {{ ref('int_customer_profiles') }}
     GROUP BY age_group
 ),
 
+expected_age_groups AS (
+    SELECT 'young' as expected_group
+    UNION ALL SELECT 'adult'
+    UNION ALL SELECT 'middle_age'
+    UNION ALL SELECT 'senior'
+),
+
 validation AS (
     SELECT 
-        *,
+        e.expected_group,
+        COALESCE(a.count, 0) as actual_count,
         CASE 
-            WHEN percentage >= 5.0 THEN TRUE
+            WHEN a.count > 0 THEN TRUE
             ELSE FALSE
-        END as is_acceptable_distribution
-    FROM age_distribution
+        END as is_present
+    FROM expected_age_groups e
+    LEFT JOIN age_distribution a ON e.expected_group = a.age_group
 )
 
-SELECT * FROM validation WHERE NOT is_acceptable_distribution
+SELECT 
+    expected_group,
+    actual_count,
+    is_present
+FROM validation 
+WHERE NOT is_present

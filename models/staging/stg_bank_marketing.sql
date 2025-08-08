@@ -12,10 +12,10 @@ cleaned AS (
         LOWER(TRIM(job)) as job,
         LOWER(TRIM(marital)) as marital_status,
         LOWER(TRIM(education)) as education_level,
-        LOWER(TRIM(default)) as has_default_credit,
+        `default` as has_default_credit,
         CAST(balance AS FLOAT64) as balance_euros,
-        LOWER(TRIM(housing)) as has_housing_loan,
-        LOWER(TRIM(loan)) as has_personal_loan,
+        housing as has_housing_loan,
+        loan as has_personal_loan,
         
         -- Datos del contacto
         LOWER(TRIM(contact)) as contact_type,
@@ -30,7 +30,7 @@ cleaned AS (
         LOWER(TRIM(poutcome)) as previous_campaign_outcome,
         
         -- Variable objetivo
-        LOWER(TRIM(y)) as subscribed_deposit,
+        y as subscribed_deposit,
         
         -- Metadatos
         CURRENT_TIMESTAMP() as _loaded_at,

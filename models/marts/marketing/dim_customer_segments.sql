@@ -1,10 +1,6 @@
 WITH customer_segments AS (
     SELECT DISTINCT
         customer_segment,
-        age_group,
-        job,
-        education_level,
-        risk_profile,
         
         -- Descripciones de segmentos
         CASE customer_segment
@@ -31,12 +27,11 @@ WITH customer_segments AS (
             WHEN 'white_collar' THEN 'premium_services'
             WHEN 'blue_collar' THEN 'basic_products'
             ELSE 'general_products'
-        END as recommended_product,
-        
-        CURRENT_TIMESTAMP() as created_at
+        END as recommended_product
         
     FROM {{ ref('int_customer_profiles') }}
     WHERE customer_segment IS NOT NULL
 )
 
 SELECT * FROM customer_segments
+

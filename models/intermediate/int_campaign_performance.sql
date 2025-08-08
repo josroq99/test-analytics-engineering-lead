@@ -17,7 +17,7 @@ WITH campaign_data AS (
     UNION ALL
     
     SELECT
-        contact_id,
+        contact_id, 
         contact_type,
         NULL as contact_day,  -- No disponible en dataset adicional
         contact_month,
@@ -34,7 +34,7 @@ WITH campaign_data AS (
 
 campaign_metrics AS (
     SELECT
-        contact_id,
+        ROW_NUMBER() OVER (ORDER BY contact_id, _loaded_at) as contact_id,
         contact_type,
         contact_day,
         contact_month,
@@ -68,11 +68,8 @@ campaign_metrics AS (
             ELSE 'long_gap'
         END as contact_timing,
         
-        -- Indicador de éxito
-        CASE 
-            WHEN subscribed_deposit = 'yes' THEN TRUE
-            ELSE FALSE
-        END as is_successful_conversion,
+        -- Indicador de éxito (subscribed_deposit ya es BOOLEAN)
+        subscribed_deposit as is_successful_conversion,
         
         -- Score de probabilidad (simulado)
         CASE 

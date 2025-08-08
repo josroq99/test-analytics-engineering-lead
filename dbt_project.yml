@@ -8,7 +8,6 @@ profile: 'bank_marketing_dm'
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -22,77 +21,27 @@ models:
   bank_marketing_dm:
     staging:
       +materialized: view
-      +schema: staging
+      +schema: "dusa_prj_sandbox_staging"
     intermediate:
       +materialized: table
-      +schema: intermediate
+      +schema: "dusa_prj_sandbox_intermediate"
     marts:
       +materialized: table
-      +schema: marts
+      +schema: "dusa_prj_sandbox_marts"
       marketing:
         +materialized: table
-        +schema: marketing
+        +schema: "dusa_prj_sandbox_marts_marketing"
 
 # Variables específicas para dbt Cloud
 vars:
-  # Configuración de BigQuery - se configurará en dbt Cloud
-  project_id: "{{ env_var('DBT_CLOUD_PROJECT_ID') }}"
+  # Configuración de BigQuery
+  project_id: "dusa-prj-sandbox"
   dataset_raw: "raw"
-  dataset_staging: "staging"
-  dataset_intermediate: "intermediate"
-  dataset_marts: "marts"
+  dataset_staging: "dusa_prj_sandbox_staging"
+  dataset_intermediate: "dusa_prj_sandbox_intermediate"
+  dataset_marts: "dusa_prj_sandbox_marts"
   
   # Configuración de Dataplex (opcional)
-  dataplex_project: "{{ env_var('DBT_CLOUD_PROJECT_ID') }}"
-  dataplex_location: "us-central1"
+  dataplex_project: "dusa-prj-sandbox"
+  dataplex_location: "US"
   dataplex_lake: "bank-marketing-lake"
-
-# Configuración de seeds para cargar datos
-seeds:
-  bank_marketing_dm:
-    bank_marketing:
-      +schema: raw
-      +column_types:
-        age: int
-        job: string
-        marital: string
-        education: string
-        default: string
-        balance: int
-        housing: string
-        loan: string
-        contact: string
-        day: int
-        month: string
-        duration: int
-        campaign: int
-        pdays: int
-        previous: int
-        poutcome: string
-        y: string
-    
-    bank_additional:
-      +schema: raw
-      +column_types:
-        age: int
-        job: string
-        marital: string
-        education: string
-        default: string
-        balance: int
-        housing: string
-        loan: string
-        contact: string
-        day: int
-        month: string
-        duration: int
-        campaign: int
-        pdays: int
-        previous: int
-        poutcome: string
-        emp_var_rate: float
-        cons_price_idx: float
-        cons_conf_idx: float
-        euribor3m: float
-        nr_employed: float
-        y: string
