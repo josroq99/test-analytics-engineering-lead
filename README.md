@@ -1,25 +1,24 @@
-# Data Mart de Marketing Bancario
+# Data Mart de Marketing Bancario - dbt Cloud
 
-Este proyecto implementa un Data Mart completo para análisis de campañas de marketing directo bancario utilizando dbt y BigQuery, con gobernanza opcional en Dataplex.
+Este proyecto implementa un Data Mart completo para análisis de campañas de marketing directo bancario utilizando **dbt Cloud** y **BigQuery**, con gobernanza opcional en **Dataplex**.
 
 ## 📊 Descripción del Proyecto
 
-El Data Mart procesa datos de campañas de marketing directo de una institución bancaria portuguesa, incluyendo:
+El Data Mart procesa datos de campañas de marketing directo de una institución bancaria portuguesa, transformando datos raw en insights accionables para el negocio.
+
+### Datasets Procesados
 - **Dataset Principal**: Información de clientes y campañas (4,521 registros)
 - **Dataset Adicional**: Contexto socioeconómico adicional (4,119 registros)
 
 ### Métricas Clave Implementadas
-
 1. **Tasa de Conversión**: `contactos_exitosos / total_contactos`
-2. **Número de Contactos Exitosos**: Conteo de conversiones
-3. **Segmentación de Clientes**: Por edad, ocupación y otros criterios
-4. **Métricas de Campaña**: Duración, frecuencia, timing
-5. **Perfiles de Riesgo**: Clasificación de riesgo del cliente
+2. **Segmentación de Clientes**: Por edad, ocupación y riesgo
+3. **Métricas de Campaña**: Duración, frecuencia, timing
+4. **Perfiles de Riesgo**: Clasificación automática de riesgo
 
 ## 🏗️ Arquitectura del Proyecto
 
 ### Estructura de Carpetas
-
 ```
 bank_marketing_dm/
 ├── models/
@@ -27,15 +26,14 @@ bank_marketing_dm/
 │   ├── intermediate/      # Modelos intermedios y transformaciones
 │   └── marts/
 │       └── marketing/     # Data marts finales
-├── seeds/                 # CSVs para dbt seed (bank_marketing / bank_additional)
 ├── tests/                 # Pruebas personalizadas
-├── macros/                # Macros reutilizables
-├── docs/                  # Documentación adicional
+├── macros/                # Macros de monitoreo y calidad
+├── docs/                  # Documentación técnica
+├── scripts/               # Scripts de integración
 └── dbt_project.yml        # Configuración del proyecto
 ```
 
 ### Capas de Datos
-
 1. **Staging (Vistas)**
    - `stg_bank_marketing`: Limpieza del dataset principal
    - `stg_bank_additional`: Limpieza del dataset adicional
@@ -48,111 +46,247 @@ bank_marketing_dm/
    - `fct_marketing_conversions`: Tabla de hechos principal
    - `dim_customer_segments`: Dimensión de segmentos
 
-## ☁️ Puesta en Marcha con dbt Cloud (Recomendado)
+## 🔄 Proceso Seguido y Decisiones Tomadas
+
+### 1. Uso de dbt Cloud
+**Decisión**: Uso de dbt Cloud para mejor gestión y escalabilidad.
+
+**Proceso**:
+- Configuración de jobs en dbt Cloud
+- Adaptación de configuración para entorno cloud
+
+### 2. Estrategia de Ingesta de Datos
+**Decisión**: Carga directa en BigQuery.
+
+**Razones**:
+- Mejor rendimiento para datasets grandes
+- Separación clara entre datos raw y transformados
+- Facilita la gobernanza de datos
+
+**Proceso**:
+- Eliminación de archivos CSV del repositorio
+- Creación de datasets raw en BigQuery
+- Uso de `dbt source()` para referenciar datos
+
+### 3. Optimización de Tests
+**Decisión**: Simplificar tests removiendo dependencias problemáticas.
+
+**Proceso**:
+- Eliminación de `dbt_utils` por problemas de compatibilidad
+- Implementación de tests básicos y confiables
+- Uso de `not_null`, `unique`, `accepted_values`
+
+### 4. Configuración de BigQuery
+**Decisión**: Usar datasets con prefijos automáticos de dbt Cloud.
+
+**Proceso**:
+- Configuración de location `us-central1`
+- Naming convention: `bank_marketing_dev_{layer}`
+- Creación automática de datasets
+
+## 🚀 Configuración y Ejecución
 
 ### Prerrequisitos
 - Proyecto de **GCP** con **BigQuery** habilitado
 - **Service Account** con permisos (BigQuery Admin/Data Editor, Job User)
 - Repositorio Git (GitHub, GitLab, Bitbucket)
+- Acceso a **dbt Cloud**
 
-### Pasos
-1. **Sube el repo** a tu proveedor Git.
-2. En **dbt Cloud**: crea un proyecto y **conecta el repo**.
-3. Configura la **conexión a BigQuery** (sube la clave de Service Account, Project ID, Location, Dataset por defecto `bank_marketing_dev`).
-4. Crea 2 entornos:
-   - Development → dataset: `bank_marketing_dev`
-   - Production → dataset: `bank_marketing_prod`
-5. Crea un **Job de Development** con comandos:
-   ```bash
-   dbt deps
-   dbt seed
-   dbt run --select staging
-   dbt run --select intermediate
-   dbt run --select marts
-   dbt test
-   ```
-6. (Opcional) Crea un **Job de Production**:
-   ```bash
-   dbt deps
-   dbt seed
-   dbt run --target prod
-   dbt test --target prod
-   dbt docs generate
-   ```
+### Paso 1: Preparar Datos en BigQuery
 
-Notas:
-- Los CSV ya están en `seeds/` (`bank_marketing.csv`, `bank_additional.csv`). Ejecuta `dbt seed` en los jobs.
-- `profiles.yml` no se usa en dbt Cloud (conexión gestionada por la UI de dbt Cloud).
+#### 1.1 Crear Datasets
+```sql
+-- Ejecutar en BigQuery Console
+CREATE SCHEMA IF NOT EXISTS `dusa-prj-sandbox.raw`
+OPTIONS(location="us-central1", description="Datos raw del proyecto");
 
-## 🔧 Uso Local (Opcional)
+CREATE SCHEMA IF NOT EXISTS `dusa-prj-sandbox.bank_marketing_dev_staging`
+OPTIONS(location="us-central1", description="Dataset para staging");
 
-Si quieres ejecutar localmente con dbt Core:
+CREATE SCHEMA IF NOT EXISTS `dusa-prj-sandbox.bank_marketing_dev_intermediate`
+OPTIONS(location="us-central1", description="Dataset para intermediate");
 
-1. Instala dependencias mínimas:
-   ```bash
-   pip install dbt-core==1.7.0 dbt-bigquery==1.7.0
-   dbt deps
-   ```
-2. Exporta credenciales y configura `profiles.yml` local (no necesario en Cloud).
-3. Ejecuta:
-   ```bash
-   dbt seed
-   dbt run
-   dbt test
-   dbt docs generate && dbt docs serve
-   ```
+CREATE SCHEMA IF NOT EXISTS `dusa-prj-sandbox.bank_marketing_dev_marts`
+OPTIONS(location="us-central1", description="Dataset para marts");
+```
 
-## 📈 Métricas y KPIs
+#### 1.2 Cargar Datos Raw
+```bash
+# Cargar dataset principal
+bq load --location=us-central1 --source_format=CSV \
+  dusa-prj-sandbox:raw.bank_marketing \
+  bank-full.csv \
+  age:INTEGER,job:STRING,marital:STRING,education:STRING,default:STRING,balance:INTEGER,housing:STRING,loan:STRING,contact:STRING,day:INTEGER,month:STRING,duration:INTEGER,campaign:INTEGER,pdays:INTEGER,previous:INTEGER,poutcome:STRING,y:STRING
 
-- **Tasa de Conversión Global**: Porcentaje de contactos exitosos
-- **Tasa por Segmento**: Conversión por grupo de clientes
-- **Tasa por Campaña**: Rendimiento por tipo de contacto
-- **Segmentación por Edad**: Young, Adult, Middle Age, Senior
-- **Perfiles de Riesgo**: High, Medium, Low, No Risk
-- **Métricas de Campaña**: Duración de llamadas, frecuencia, timing
+# Cargar dataset adicional
+bq load --location=Uus-central1 --source_format=CSV \
+  dusa-prj-sandbox:raw.bank_additional \
+  bank-additional-full.csv \
+  age:INTEGER,job:STRING,marital:STRING,education:STRING,default:STRING,balance:INTEGER,housing:STRING,loan:STRING,contact:STRING,day:INTEGER,month:STRING,duration:INTEGER,campaign:INTEGER,pdays:INTEGER,previous:INTEGER,poutcome:STRING,y:STRING,emp_var_rate:FLOAT,cons_price_idx:FLOAT,cons_conf_idx:FLOAT,euribor3m:FLOAT,nr_employed:FLOAT
+```
 
-## 🧪 Pruebas y Validación
+### Paso 2: Configurar dbt Cloud
 
-- Pruebas de integridad: `not_null`, `accepted_values`, reglas de rango (via `dbt_utils.expression_is_true`)
-- Pruebas personalizadas: en `tests/`
+#### 2.1 Crear Proyecto
+1. Ir a [dbt Cloud](https://cloud.getdbt.com)
+2. Crear nuevo proyecto
+3. Conectar repositorio Git
+4. Configurar conexión BigQuery:
+   - **Project ID**: `dusa-prj-sandbox`
+   - **Location**: `us-central1`
+   - **Dataset**: `bank_marketing_dev`
+
+#### 2.2 Configurar Jobs
+Crear los siguientes jobs en dbt Cloud:
+
+**Job 1: Build Completo**
+```bash
+dbt deps
+dbt build --full-refresh
+```
+- **Schedule**: `0 2 * * *` (Diario a las 2 AM)
+- **Timeout**: 3600 segundos
+
+**Job 2: Documentación**
+```bash
+dbt deps
+dbt docs generate
+dbt docs serve --port 8080
+```
+- **Schedule**: `0 4 * * 0` (Semanal los domingos)
+
+### Paso 3: Ejecutar Pipeline
+
+#### 3.1 Primera Ejecución
+```bash
+# En dbt Cloud Development Environment
+dbt deps
+dbt build
+dbt test
+```
+
+#### 3.2 Verificar Resultados
+```sql
+-- Verificar datos en staging
+SELECT COUNT(*) FROM `dusa-prj-sandbox.bank_marketing_dev_staging.stg_bank_marketing`;
+
+-- Verificar métricas de conversión
+SELECT 
+    AVG(conversion_rate) as avg_conversion_rate,
+    COUNT(*) as total_contacts
+FROM `dusa-prj-sandbox.bank_marketing_dev_marts.fct_marketing_conversions`;
+```
+
+## 📈 Consultas de Ejemplo
+
+### Análisis de Conversión por Segmento
+```sql
+SELECT 
+    cs.customer_segment,
+    cs.segment_description,
+    AVG(fmc.conversion_rate) as avg_conversion_rate,
+    COUNT(*) as total_contacts
+FROM `dusa-prj-sandbox.bank_marketing_dev_marts.fct_marketing_conversions` fmc
+JOIN `dusa-prj-sandbox.bank_marketing_dev_intermediate.int_customer_profiles` icp 
+    ON fmc.contact_id = icp.contact_id
+JOIN `dusa-prj-sandbox.bank_marketing_dev_marts.dim_customer_segments` cs 
+    ON icp.customer_segment = cs.customer_segment
+GROUP BY cs.customer_segment, cs.segment_description
+ORDER BY avg_conversion_rate DESC;
+```
+
+### Rendimiento de Campañas por Duración
+```sql
+SELECT 
+    icp.call_duration_category,
+    AVG(fmc.conversion_rate) as conversion_rate,
+    COUNT(*) as total_calls
+FROM `dusa-prj-sandbox.bank_marketing_dev_marts.fct_marketing_conversions` fmc
+JOIN `dusa-prj-sandbox.bank_marketing_dev_intermediate.int_campaign_performance` icp 
+    ON fmc.contact_id = icp.contact_id
+GROUP BY icp.call_duration_category
+ORDER BY conversion_rate DESC;
+```
+
+## 🧪 Tests y Validación
+
+### Tests Implementados
+- **Unicidad**: `contact_id` en todas las tablas
+- **Completitud**: Campos obligatorios con `not_null`
+- **Valores válidos**: `accepted_values` para categorías
+- **Distribución**: Test personalizado para grupos de edad
+
+### Ejecutar Tests
+```bash
+# Ejecutar todos los tests
+dbt test
+
+# Ejecutar test específico
+dbt test --models stg_bank_marketing
+
+# Ejecutar test personalizado
+dbt test --select test_age_group_distribution
+```
+
+## 📊 Monitoreo y Calidad
+
+### Macros de Monitoreo
+El proyecto incluye macros para monitoreo automático:
+
+```sql
+-- Monitoreo de calidad
+{{ quality_monitoring() }}
+
+-- Alertas de calidad
+{{ quality_alerts() }}
+
+### Métricas a Monitorear
+1. **Calidad de Datos**: Tasa de completitud > 95%
+2. **Rendimiento**: Tiempo de build < 30 minutos
+3. **Negocio**: Tasa de conversión > 10%
 
 ## 🔒 Gobernanza con Dataplex (Opcional)
 
-- Zonas de datos: Raw, Staging, Curated
-- Policy tags: PII, Financial Data, Campaign Data
-- Reglas de calidad: completitud mínima del 95%, rangos de edad, dominios válidos
+### Configuración
+1. Habilitar Dataplex API en GCP
+2. Ejecutar `scripts/dataplex_integration.sql`
+3. Configurar políticas de calidad automáticas
 
-## 🔄 Ejecución Automatizada en dbt Cloud
+### Beneficios
+- Clasificación automática de datos
+- Políticas de calidad en tiempo real
+- Auditoría de acceso y uso
 
-- Jobs por entorno (Dev/Prod)
-- Schedules (cron) y triggers por push
-- Logs, alertas y documentación integrados
+## 📚 Documentación Adicional
 
-## 📊 Consultas de Ejemplo
+- **`docs/CONFIGURACION_FINAL.md`**: Guía completa de configuración
+- **`docs/models.md`**: Documentación técnica de modelos
+- **`CONTRIBUTING.md`**: Guías de contribución
 
-### Tasa de Conversión por Segmento
-```sql
-SELECT 
-    customer_segment,
-    COUNT(*) as total_contacts,
-    SUM(conversion_flag) as successful_conversions,
-    AVG(conversion_rate) * 100 as conversion_rate_percent
-FROM {{ ref('fct_marketing_conversions') }}
-GROUP BY customer_segment
-ORDER BY conversion_rate_percent DESC;
+## 🛠️ Troubleshooting
+
+### Problemas Comunes
+
+**Error: "Dataset not found"**
+```bash
+# Verificar datasets creados
+bq ls dusa-prj-sandbox
 ```
 
-### Rendimiento por Tipo de Contacto
-```sql
-SELECT 
-    contact_type,
-    call_duration_category,
-    COUNT(*) as total_calls,
-    AVG(conversion_rate) * 100 as conversion_rate_percent
-FROM {{ ref('fct_marketing_conversions') }}
-GROUP BY contact_type, call_duration_category
-ORDER BY conversion_rate_percent DESC;
+**Error: "Permission denied"**
+```bash
+# Verificar permisos de Service Account
+gcloud projects get-iam-policy dusa-prj-sandbox
 ```
+
+**Error: "Job timeout"**
+- Aumentar timeout en configuración de job
+- Optimizar queries complejas
+- Usar incremental models
+
+### Logs y Debugging
+- Ver logs en dbt Cloud: Jobs → Job History
+- Debugging local: `dbt debug`
 
 ## 📝 Licencia
 
